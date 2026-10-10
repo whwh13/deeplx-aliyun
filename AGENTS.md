@@ -32,7 +32,11 @@ curl -X POST http://127.0.0.1:5188/translate -H "Content-Type: application/json"
   -d '{"text":"你好","source_lang":"auto","target_lang":"EN"}'
 # 打包
 uv run pyinstaller --onefile --noconsole --name DeepLXAliyun main.py
+# 性能压测（网关运行中；读 config.json，占位符则回退 dist/config.json）
+uv run python bench.py
 ```
+
+`bench.py` 测直连（进程内 lru_cache）vs 转接（服务端 lru_cache）各 20 次短请求，冷/热两轮；转接端缓存驻留在运行中的 exe 进程内，测"真冷"须先重启网关。
 
 打包后验证：`dist/DeepLXAliyun.exe` 同目录放好 `config.json`，`GET /` 应返回监听信息；任务管理器出现两个 DeepLXAliyun.exe 进程属正常（onefile 引导 + 主体）。
 
