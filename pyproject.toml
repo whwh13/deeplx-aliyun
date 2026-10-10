@@ -1,0 +1,19 @@
+[project]
+name = "deeplx-aliyun"
+version = "1.0.0"
+description = "DeepLX 协议转阿里云机器翻译的本地托盘服务"
+requires-python = ">=3.12"
+dependencies = [
+    "pystray>=0.19",
+    "pillow>=10.0",
+    "requests>=2.31",
+]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.0",
+]
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true

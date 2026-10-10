@@ -1,0 +1,30 @@
+name: build-release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pystray pillow requests pyinstaller
+
+      - name: Build exe
+        run: pyinstaller --onefile --noconsole --name DeepLXAliyun main.py
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/DeepLXAliyun.exe
+          body: DeepLX-Aliyun 单文件版（Windows x64，无控制台）。使用时将 config.json 放在 exe 同目录，模板见仓库 config.example.json。

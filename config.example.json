@@ -1,0 +1,9 @@
+{
+  "host": "127.0.0.1",
+  "port": 5188,
+  "endpoint": "https://mt.aliyuncs.com",
+  "region": "cn-hangzhou",
+  "scene": "general",
+  "access_key_id": "在此填写 AccessKey ID",
+  "access_key_secret": "在此填写 AccessKey Secret"
+}
