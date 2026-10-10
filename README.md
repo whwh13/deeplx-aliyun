@@ -100,3 +100,4 @@ autostart.py   HKCU Run 注册表开机自启开关
 
 - 2026-10-10 完成：协议转换、托盘、自启、PyInstaller 打包均验证通过。
 - 2026-10-10 真实翻译实测通过（auto→EN / EN→ZH / JA→ZH / 5600 字长文本分片），RAM 子账号已获 `alimt:TranslateGeneral` 授权。
+- 2026-10-11 v1.1.0 性能优化：服务端 HTTP/1.1 保活 + 到阿里云的 TLS 连接复用（thread-local Session）+ lru_cache 结果缓存（2000 条）。实测（20 次短文本请求）：直连 359ms → 直连 keep-alive 256ms → 转接 keep-alive 258ms（与最优直连持平，零额外开销）；缓存命中 1-3ms。
