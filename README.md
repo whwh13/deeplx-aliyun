@@ -105,3 +105,14 @@ autostart.py   HKCU Run 注册表开机自启开关
 - 2026-10-10 完成：协议转换、托盘、自启、PyInstaller 打包均验证通过。
 - 2026-10-10 真实翻译实测通过（auto→EN / EN→ZH / JA→ZH / 5600 字长文本分片），RAM 子账号已获 `alimt:TranslateGeneral` 授权。
 - 2026-10-11 v1.1.0 性能优化：服务端 HTTP/1.1 保活 + 到阿里云的 TLS 连接复用（thread-local Session）+ lru_cache 结果缓存（2000 条）。实测（20 次短文本请求）：直连 359ms → 直连 keep-alive 256ms → 转接 keep-alive 258ms（与最优直连持平，零额外开销）；缓存命中 1-3ms。
+
+## 性能压测
+
+`bench.py`：直连阿里云（带进程内缓存）vs 经网关转接（带服务端缓存）的对比测试，10 任务 × 2 短语共 20 次请求，冷缓存/缓存命中两轮。
+
+```bash
+# 网关运行中、config.json 填好 Key 后
+uv run python bench.py
+```
+
+参考结果：冷缓存两端持平（~360ms/次，瓶颈在阿里云 RTT）；缓存命中直连 0ms（进程内查表）、转接 ~3-10ms（多一圈 localhost HTTP），实际使用无感。转接缓存由服务端持有，跨客户端共享、客户端重启不丢。
