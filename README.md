@@ -2,6 +2,8 @@
 
 本地 DeepLX 协议 → 阿里云机器翻译（TranslateGeneral）的转换网关，带 Windows 托盘图标与开机自启动。
 
+**仓库**：https://github.com/whwh13/deeplx-aliyun （打 `v*` tag 自动构建并发布 exe 到 GitHub Releases）
+
 ## 它做什么
 
 在 `127.0.0.1:5188` 上提供标准 **DeepLX 协议**接口，把请求转发到阿里云机器翻译：
@@ -75,6 +77,8 @@ uv run pyinstaller --onefile --noconsole --name DeepLXAliyun main.py
 ```
 
 产物在 `dist/DeepLXAliyun.exe`，使用时把 `config.json` 放在 exe 同目录。
+
+**自动构建**：推送 `v*` tag（如 `git tag v1.0.1 && git push origin v1.0.1`），GitHub Actions 会在 windows-latest 上构建 exe 并发布到 Releases（`.github/workflows/release.yml`）。
 
 ## 安全提示
 

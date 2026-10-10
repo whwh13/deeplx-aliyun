@@ -15,6 +15,8 @@
 
 ## 本机关键事实
 
+- **GitHub**：仓库 https://github.com/whwh13/deeplx-aliyun（public），git 已配本地代理 `http.proxy http://127.0.0.1:18888`，推送用 Git Credential Manager 里的凭据；CI 打 `v*` tag 触发 windows-latest 构建并发布 Release（softprops/action-gh-release）。
+
 - **端口必须避开 Windows 保留段**：`netsh interface ipv4 show excludedportrange protocol=tcp` 里 1119-1218 被排除，DeepLX 惯例的 1188 会绑定失败（WinError 10013），故默认 5188。
 - AccessKey 是敏感凭证，只放 `config.json`（已 gitignore），测试 Key 用完由用户禁用；仓库里只保留 `config.example.json` 模板。
 
