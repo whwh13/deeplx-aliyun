@@ -4,6 +4,10 @@
 
 **仓库**：https://github.com/whwh13/deeplx-aliyun （打 `v*` tag 自动构建并发布 exe 到 GitHub Releases）
 
+## 声明
+
+本项目是**纯 vibecoding 项目**：全部代码（含协议实现、签名、托盘、打包与 CI）由 AI 生成，未经人工逐行审阅。使用前请自行评估；欢迎提 Issue，但不保证响应速度。
+
 ## 它做什么
 
 在 `127.0.0.1:5188` 上提供标准 **DeepLX 协议**接口，把请求转发到阿里云机器翻译：
