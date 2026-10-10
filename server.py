@@ -34,6 +34,10 @@ class State:
 
 def make_handler(cfg: dict):
     class Handler(BaseHTTPRequestHandler):
+        # 1.1 保持连接：客户端复用 localhost 连接时线程复用，
+        # 线程局部 Session 到阿里云的 TLS 连接也才能复用
+        protocol_version = "HTTP/1.1"
+
         def _send(self, status: int, payload: dict):
             body = json.dumps(payload).encode("utf-8")
             self.send_response(status)

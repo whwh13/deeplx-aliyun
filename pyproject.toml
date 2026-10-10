@@ -1,6 +1,6 @@
 [project]
 name = "deeplx-aliyun"
-version = "1.0.0"
+version = "1.1.0"
 description = "DeepLX 协议转阿里云机器翻译的本地托盘服务"
 requires-python = ">=3.12"
 dependencies = [

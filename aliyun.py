@@ -1,12 +1,30 @@
 import base64
 import hashlib
 import hmac
+import threading
 import time
 import urllib.parse
 import uuid
 import xml.etree.ElementTree as ET
+from functools import lru_cache
 
 import requests
+
+# 线程局部会话：ThreadingHTTPServer 每条客户端连接一个线程，
+# 会话在该线程内复用与阿里云的 TLS 连接；trust_env=False 跳过
+# 每请求一次的注册表系统代理探测（endpoint 固定走直连）。
+_thread = threading.local()
+
+
+def _session() -> requests.Session:
+    s = getattr(_thread, "session", None)
+    if s is None:
+        s = requests.Session()
+        s.trust_env = False
+        adapter = requests.adapters.HTTPAdapter(pool_maxsize=16)
+        s.mount("https://", adapter)
+        _thread.session = s
+    return s
 
 # DeepLX 大写语种 → 阿里云小写语种（未列出的按小写直传）
 LANG_MAP = {
@@ -82,6 +100,25 @@ def translate(
     tgt = normalize_lang(target_lang)
     if not text:
         return "", ""
+    return _translate_cached(
+        text, src, tgt,
+        cfg["endpoint"], cfg["scene"],
+        cfg["access_key_id"], cfg["access_key_secret"],
+        timeout,
+    )
+
+
+@lru_cache(maxsize=2000)
+def _translate_cached(
+    text: str,
+    src: str,
+    tgt: str,
+    endpoint: str,
+    scene: str,
+    ak_id: str,
+    ak_secret: str,
+    timeout: float,
+) -> tuple[str, str]:
     detected = ""
     parts = []
     for chunk in split_text(text):
@@ -92,16 +129,16 @@ def translate(
             "SourceLanguage": src,
             "TargetLanguage": tgt,
             "SourceText": chunk,
-            "Scene": cfg["scene"],
-            "AccessKeyId": cfg["access_key_id"],
+            "Scene": scene,
+            "AccessKeyId": ak_id,
             "SignatureMethod": "HMAC-SHA1",
             "SignatureVersion": "1.0",
             "SignatureNonce": str(uuid.uuid4()),
             "Timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         }
-        params["Signature"] = sign_params(params, cfg["access_key_secret"])
+        params["Signature"] = sign_params(params, ak_secret)
         try:
-            resp = requests.get(cfg["endpoint"], params=params, timeout=timeout)
+            resp = _session().get(endpoint, params=params, timeout=timeout)
         except requests.RequestException as e:
             raise AliyunMtError(502, f"请求阿里云失败: {e}") from e
         # 阿里云 RPC 成功/失败都返回 XML（<TranslateGeneralResponse> 或 <Error>）
